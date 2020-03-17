@@ -31,18 +31,19 @@ export class HotSeatEngine extends Engine {
         (<LocalPlayer[]> this.players).forEach(p => {
             p.direction = p.direction_queue.next()
         })
+        this.elapseTime()
 
+        // check if somebody died
         this.players.forEach(p => {
-            let next_pos = Engine.nextPosition(p)
             // Check collide with wall
-            if (next_pos.y < 0 || next_pos.x < 0 ||
-                next_pos.x >= this.game_size.width || next_pos.y >= this.game_size.height) {
+            if (p.position.y < 0 || p.position.x < 0 ||
+                p.position.x >= this.game_size.width || p.position.y >= this.game_size.height) {
                 p.is_dead = true
             }
             // Check collide with players' history and head
             this.players.forEach(o => {
                 o.history.forEach(pos => {
-                    if (pos.x == next_pos.x && pos.y == next_pos.y) {
+                    if (pos.x == p.position.x && pos.y == p.position.y) {
                         p.is_dead = true
                     }
                 })
@@ -50,7 +51,7 @@ export class HotSeatEngine extends Engine {
                     return  // same player, head is same
                 // check colliding with head
                 // both players should die
-                if (o.position.x == next_pos.x && o.position.y == next_pos.y) {
+                if (o.position.x == p.position.x && o.position.y == p.position.y) {
                     p.is_dead = true
                     o.is_dead = true
                 }
@@ -65,8 +66,6 @@ export class HotSeatEngine extends Engine {
             this.game_over = true
             clearInterval(this.timer_id)
         }
-        this.elapseTime()
-
     }
 
     resetGame() {

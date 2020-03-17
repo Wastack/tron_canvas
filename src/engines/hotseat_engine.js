@@ -42,17 +42,18 @@ var HotSeatEngine = /** @class */ (function (_super) {
         this.players.forEach(function (p) {
             p.direction = p.direction_queue.next();
         });
+        this.elapseTime();
+        // check if somebody died
         this.players.forEach(function (p) {
-            var next_pos = Engine.nextPosition(p);
             // Check collide with wall
-            if (next_pos.y < 0 || next_pos.x < 0 ||
-                next_pos.x >= _this.game_size.width || next_pos.y >= _this.game_size.height) {
+            if (p.position.y < 0 || p.position.x < 0 ||
+                p.position.x >= _this.game_size.width || p.position.y >= _this.game_size.height) {
                 p.is_dead = true;
             }
             // Check collide with players' history and head
             _this.players.forEach(function (o) {
                 o.history.forEach(function (pos) {
-                    if (pos.x == next_pos.x && pos.y == next_pos.y) {
+                    if (pos.x == p.position.x && pos.y == p.position.y) {
                         p.is_dead = true;
                     }
                 });
@@ -60,7 +61,7 @@ var HotSeatEngine = /** @class */ (function (_super) {
                     return; // same player, head is same
                 // check colliding with head
                 // both players should die
-                if (o.position.x == next_pos.x && o.position.y == next_pos.y) {
+                if (o.position.x == p.position.x && o.position.y == p.position.y) {
                     p.is_dead = true;
                     o.is_dead = true;
                 }
@@ -75,7 +76,6 @@ var HotSeatEngine = /** @class */ (function (_super) {
             this.game_over = true;
             clearInterval(this.timer_id);
         }
-        this.elapseTime();
     };
     HotSeatEngine.prototype.resetGame = function () {
         var _this = this;

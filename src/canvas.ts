@@ -44,7 +44,7 @@ export class GameMap {
         ctx.fillStyle = 'black'
 
         // Border is the first thing that is *outside* the map, hence the +1 unit
-        ctx.strokeRect(this.w_padding, this.h_padding, w_required + this.unit_size, h_required + this.unit_size)
+        ctx.strokeRect(this.w_padding, this.h_padding, w_required, h_required + this.unit_size)
     }
 
     /**
