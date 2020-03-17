@@ -3,11 +3,37 @@ import { GameMap } from "../canvas.js"
 import { Size, Color, Position } from "../utils.js"
 
 class LocalPlayer extends Player {
+    public controls?: { up: string, down: string, left: string, right: string }
     direction_queue: DirectionQueue
-    
+
     constructor(color: Color, direction: Direction, position: Position) {
         super(color, direction, position)
         this.direction_queue = new DirectionQueue(direction)
+    }
+
+    setControls(up: string, down: string, left: string, right: string) {
+        this.controls = { up: up, down: down, left: left, right: right }
+    }
+
+    tryKeyControl(key: string) {
+        if (this.controls === undefined) {
+            return
+        }
+        switch (key) {
+            case this.controls.up:
+                this.direction_queue.push_back(Direction.Up);
+                break;
+            case this.controls.down:
+                this.direction_queue.push_back(Direction.Down);
+                break;
+            case this.controls.left:
+                this.direction_queue.push_back(Direction.Left);
+                break;
+            case this.controls.right:
+                this.direction_queue.push_back(Direction.Right);
+                break;
+        }
+
     }
 }
 
@@ -28,7 +54,7 @@ export class HotSeatEngine extends Engine {
 
     elapseTimeWithCheck() {
         // assign new directions
-        (<LocalPlayer[]> this.players).forEach(p => {
+        (<LocalPlayer[]>this.players).forEach(p => {
             p.direction = p.direction_queue.next()
         })
         this.elapseTime()
@@ -73,9 +99,14 @@ export class HotSeatEngine extends Engine {
         let pos1y = Math.floor(this.game_size.height / 4)
         let pos2x = Math.floor(this.game_size.width * (3 / 4))
         let pos2y = Math.floor(this.game_size.height * (3 / 4))
+
+        let player1 = new LocalPlayer("#FF0000", Direction.Right, { x: pos1x, y: pos1y })
+        player1.setControls("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight")
+        let player2 = new LocalPlayer("#00FF00", Direction.Left, { x: pos2x, y: pos2y })
+        player2.setControls("w", "s", "a", "d")
         this.players = [
-            new LocalPlayer("#FF0000", Direction.Right, { x: pos1x, y: pos1y }),
-            new LocalPlayer("#00FF00", Direction.Left, { x: pos2x, y: pos2y })
+            player1,
+            player2
         ]
 
         this.game_map.clearMap()
@@ -107,39 +138,13 @@ export class HotSeatEngine extends Engine {
 
     registerKeyboardEvents() {
         document.addEventListener('keydown', e => {
-            switch (e.key) {
-                case "Enter":
-                    this.userStartOrReset();
-                    break;
-                case "ArrowDown":
-                    (<LocalPlayer> this.players[0]).direction_queue.push_back(Direction.Down)
-                    break;
-                case "ArrowUp":
-                    (<LocalPlayer> this.players[0]).direction_queue.push_back(Direction.Up)
-                    break;
-                case "ArrowLeft":
-                    (<LocalPlayer> this.players[0]).direction_queue.push_back(Direction.Left)
-                    break;
-                case "ArrowRight":
-                    (<LocalPlayer> this.players[0]).direction_queue.push_back(Direction.Right)
-                    break;
-                case "w":
-                case "W":
-                    (<LocalPlayer> this.players[1]).direction_queue.push_back(Direction.Up)
-                    break;
-                case "a":
-                case "A":
-                    (<LocalPlayer> this.players[1]).direction_queue.push_back(Direction.Left)
-                    break;
-                case "S":
-                case "s":
-                    (<LocalPlayer> this.players[1]).direction_queue.push_back(Direction.Down)
-                    break;
-                case "D":
-                case "d":
-                    (<LocalPlayer> this.players[1]).direction_queue.push_back(Direction.Right)
-                    break;
+            if (e.key == "Enter") {
+                this.userStartOrReset();
+                return
             }
+            (<LocalPlayer[]>this.players).forEach(p => {
+                p.tryKeyControl(e.key)
+            })
         })
     }
 }
@@ -152,7 +157,7 @@ class DirectionQueue {
     }
 
     next(): Direction {
-        if(this.queue.length > 1) {
+        if (this.queue.length > 1) {
             return this.queue.shift()!!;
         } else {
             return this.queue[0]
@@ -174,7 +179,7 @@ class DirectionQueue {
             }
         }
         // check if direction is not opposite to the last command
-        if(this.queue[this.queue.length-1] == opposite(dir))
+        if (this.queue[this.queue.length - 1] == opposite(dir))
             return  // Invalid direction, cannot put to queue
         this.queue.push(dir)
     }
