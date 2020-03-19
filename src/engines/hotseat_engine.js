@@ -4,6 +4,28 @@ class LocalPlayer extends Player {
         super(color, direction, position);
         this.direction_queue = new DirectionQueue(direction);
     }
+    setControls(up, down, left, right) {
+        this.controls = { up: up, down: down, left: left, right: right };
+    }
+    tryKeyControl(key) {
+        if (this.controls === undefined) {
+            return;
+        }
+        switch (key) {
+            case this.controls.up:
+                this.direction_queue.push_back(Direction.Up);
+                break;
+            case this.controls.down:
+                this.direction_queue.push_back(Direction.Down);
+                break;
+            case this.controls.left:
+                this.direction_queue.push_back(Direction.Left);
+                break;
+            case this.controls.right:
+                this.direction_queue.push_back(Direction.Right);
+                break;
+        }
+    }
 }
 export class HotSeatEngine extends Engine {
     constructor(gameMap, gameSize) {
@@ -62,9 +84,13 @@ export class HotSeatEngine extends Engine {
         let pos1y = Math.floor(this.game_size.height / 4);
         let pos2x = Math.floor(this.game_size.width * (3 / 4));
         let pos2y = Math.floor(this.game_size.height * (3 / 4));
+        let player1 = new LocalPlayer("#FF0000", Direction.Right, { x: pos1x, y: pos1y });
+        player1.setControls("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight");
+        let player2 = new LocalPlayer("#00FF00", Direction.Left, { x: pos2x, y: pos2y });
+        player2.setControls("w", "s", "a", "d");
         this.players = [
-            new LocalPlayer("#FF0000", Direction.Right, { x: pos1x, y: pos1y }),
-            new LocalPlayer("#00FF00", Direction.Left, { x: pos2x, y: pos2y })
+            player1,
+            player2
         ];
         this.game_map.clearMap();
         this.players.forEach(p => {
@@ -93,39 +119,13 @@ export class HotSeatEngine extends Engine {
     }
     registerKeyboardEvents() {
         document.addEventListener('keydown', e => {
-            switch (e.key) {
-                case "Enter":
-                    this.userStartOrReset();
-                    break;
-                case "ArrowDown":
-                    this.players[0].direction_queue.push_back(Direction.Down);
-                    break;
-                case "ArrowUp":
-                    this.players[0].direction_queue.push_back(Direction.Up);
-                    break;
-                case "ArrowLeft":
-                    this.players[0].direction_queue.push_back(Direction.Left);
-                    break;
-                case "ArrowRight":
-                    this.players[0].direction_queue.push_back(Direction.Right);
-                    break;
-                case "w":
-                case "W":
-                    this.players[1].direction_queue.push_back(Direction.Up);
-                    break;
-                case "a":
-                case "A":
-                    this.players[1].direction_queue.push_back(Direction.Left);
-                    break;
-                case "S":
-                case "s":
-                    this.players[1].direction_queue.push_back(Direction.Down);
-                    break;
-                case "D":
-                case "d":
-                    this.players[1].direction_queue.push_back(Direction.Right);
-                    break;
+            if (e.key == "Enter") {
+                this.userStartOrReset();
+                return;
             }
+            this.players.forEach(p => {
+                p.tryKeyControl(e.key);
+            });
         });
     }
 }
