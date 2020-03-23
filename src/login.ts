@@ -1,5 +1,8 @@
 import {GameMap} from "./canvas.js"
 import {HotSeatEngine} from "./engines/hotseat_engine.js"
+import {WebSocketClient} from "./service/connection.js"
+import { ClientEngine } from "./engines/client_engine.js"
+
 
 export function ShowLogin() {
     let login_div = document.getElementById("input-container")
@@ -35,6 +38,7 @@ export function ShowLogin() {
             alert("User name should be at least 3 characters long.")
         }
 
+        let client = new WebSocketClient(new ClientEngine([], new GameMap({ width: 1024, height: 800 }, { width: 100, height: 100 }), { width: 100, height: 100 }))
         // TODO start server engine
         
     }
