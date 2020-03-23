@@ -19,7 +19,19 @@
 </head>
 
 <body>
-    <div id="canvas-container">
+    <div hidden id="input-container" display="none">
+        <form>
+            <label>Username: </label>
+            <input type="text" id="user_name_input" value="Newby" onClick="this.select();"/><br>
+            <button type='button' id="play_server_button">
+                Play on server!
+            </button>
+            <button type='button' id="hotseat_button">
+                Hot-seat game!
+            </button>
+        </form>
+    </div>
+    <div hidden id="canvas-container">
         <canvas id="mycanvas" width="1024" height="800"></canvas>
     </div>
     </div>

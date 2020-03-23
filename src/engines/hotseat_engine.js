@@ -76,6 +76,7 @@ export class HotSeatEngine extends Engine {
         });
         if (alive_count < 2) {
             this.game_over = true;
+            // stop timer
             clearInterval(this.timer_id);
         }
     }
@@ -117,6 +118,9 @@ export class HotSeatEngine extends Engine {
         }
         return true;
     }
+    /**
+     * Register keyboard events for local players and other (e.g. enter button)
+     */
     registerKeyboardEvents() {
         document.addEventListener('keydown', e => {
             if (e.key == "Enter") {

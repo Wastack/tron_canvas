@@ -40,7 +40,7 @@ class LocalPlayer extends Player {
 export class HotSeatEngine extends Engine {
     game_started: boolean = false
     game_over: boolean = false
-    timer_id: number = 0
+    timer_id: any = 0
     readonly SPEED_MILISEC = 50
 
     constructor(gameMap: GameMap, gameSize: Size) {
@@ -90,6 +90,7 @@ export class HotSeatEngine extends Engine {
         });
         if (alive_count < 2) {
             this.game_over = true
+            // stop timer
             clearInterval(this.timer_id)
         }
     }
@@ -136,6 +137,9 @@ export class HotSeatEngine extends Engine {
     }
 
 
+    /**
+     * Register keyboard events for local players and other (e.g. enter button)
+     */
     registerKeyboardEvents() {
         document.addEventListener('keydown', e => {
             if (e.key == "Enter") {
