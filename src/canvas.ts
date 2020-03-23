@@ -1,5 +1,5 @@
 
-import { Size } from "utils.js"
+import { Size } from "./utils.js"
 
 export class GameMap {
     canvas: HTMLCanvasElement
